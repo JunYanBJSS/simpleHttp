@@ -44,8 +44,8 @@ func (wp *workerPool) Run() {
 	}
 }
 
-func (wp *workerPool) AddTask(task *job) {
-	wp.jobQueue <- *task
+func (wp *workerPool) AddTask(task job) {
+	wp.jobQueue <- task
 }
 
 type People struct {
@@ -132,10 +132,10 @@ func NewServer() {
 	go run()
 	server := &http.Server{Addr: ":8080"}
 	http.HandleFunc("/test", func(w http.ResponseWriter, r *http.Request) {
-		workerPool.AddTask(&job{Request: r, Response: w})
+		workerPool.AddTask(job{Request: r, Response: w})
 	})
 	http.HandleFunc("/delete/", func(w http.ResponseWriter, r *http.Request) {
-		workerPool.AddTask(&job{Request: r, Response: w})
+		workerPool.AddTask(job{Request: r, Response: w})
 	})
 	terminate := make(chan os.Signal, 1)
 	go func() {
