@@ -89,18 +89,23 @@ func handleDelete(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, <-res)
 }
 func handleRequest(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("handleRequest")
 	if strings.Contains(r.URL.Path, "/delete/") {
 		handleDelete(w, r)
 		return
 	}
+
 	response := make(chan string)
-	defer close(response)
 	switch r.Method {
 	case "GET":
 		func(w http.ResponseWriter, r *http.Request) {
-
+			fmt.Println("--get")
 			messageChan <- message{command: "get", response: response}
-			fmt.Fprintln(w, <-response)
+			responseData := <-response
+			fmt.Fprintln(w, "hi")
+			fmt.Fprintln(w, responseData)
+			fmt.Println("Received response data:", responseData)
+			fmt.Println("--finish--")
 		}(w, r)
 	case "POST":
 		func(w http.ResponseWriter, r *http.Request) {
@@ -119,6 +124,8 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 	}
 }
 func NewServer() {
+	peopleMap["yan"] = 18
+	peopleMap["li"] = 19
 	workerPool := NewWorkerPool(10)
 	workerPool.Run()
 
